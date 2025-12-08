@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
+import { Eye, EyeOff} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { singnupSchema, type SingnupSchema } from "~/schemas/auth";
 
@@ -11,6 +12,8 @@ import { singnupSchema, type SingnupSchema } from "~/schemas/auth";
 export default function SignupPage(){
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [show, setShow] = useState(false)
+    const [cshow, setShowC] = useState(false)
 
     const form = useForm<SingnupSchema>({
         resolver: zodResolver(singnupSchema),
@@ -87,41 +90,60 @@ export default function SignupPage(){
                             }
                         </div>
 
-                        <div>
+                        <div className="relative">
                             <label className="text-sm font-medium text-gray-700">
                                 Password
                             </label>
                             <input {...form.register("password")}
-                            type="password"
+                            type={show ? "text" : "password"} 
                             placeholder="********"
-                            className="text-sm mt-1 w-full block border rounded-md border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none hover:border-blue-300 "
+                            className="text-sm mt-1 w-full border rounded-md border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none hover:border-blue-300 "
                             />
-                            {
-                                form.formState.errors.password && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                        {form.formState.errors.password.message}
-                                    </p>
-                                )
-                            }
+                            <button type="button" 
+                            onClick={() => setShow(!show)}
+                            className="absolute flex right-0 top-1/2 translate-y-1/4 items-center px-2 cursor-pointer">
+                                {show ? (
+                                    <EyeOff className="w-5 h-5 text-gray-500"/>
+                                ): (
+                                    <Eye className="w-5 h-5 text-gray-500"/>
+                                )}
+                            </button>
                         </div>
+                        {
+                            form.formState.errors.password && (
+                                <p className="mt-1 text-sm text-red-500">
+                                    {form.formState.errors.password.message}
+                                </p>
+                            )
+                        }
 
-                        <div>
+                        <div className="relative">
                             <label className="text-sm font-medium text-gray-700">
                                 Confirm password
                             </label>
-                            <input {...form.register("password")}
-                            type="password"
+                            <input {...form.register("confirmPassword")}
+                            type={cshow ? "text" : "password"} 
                             placeholder="********"
-                            className="text-sm mt-1 w-full block border rounded-md border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none hover:border-blue-300 "
+                            className="text-sm mt-1 w-full border rounded-md border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none hover:border-blue-300 "
                             />
-                            {
-                                form.formState.errors.confirmPassword && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                        {form.formState.errors.confirmPassword.message}
-                                    </p>
-                                )
-                            }
+                            <button type="button" 
+                            onClick={() => setShowC(!cshow)}
+                            className="absolute flex right-0 top-1/2 translate-y-1/4 items-center px-2 cursor-pointer">
+                                {cshow ? (
+                                    <EyeOff className="w-5 h-5 text-gray-500"/>
+                                ): (
+                                    <Eye className="w-5 h-5 text-gray-500"/>
+                                )}
+                            </button>
                         </div>
+                        {
+                            form.formState.errors.confirmPassword && (
+                                <p className="mt-1 text-sm text-red-500">
+                                    {form.formState.errors.confirmPassword.message}
+                                </p>
+                            )
+                        }
+
                     </div>
 
                     <button type="submit" disabled={loading} className="text-sm flex w-full justify-center rounded-md bg-gray-800 text-white px-4 py-2 font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2, disabled:opacity-50">
