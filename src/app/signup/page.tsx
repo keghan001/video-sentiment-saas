@@ -6,10 +6,14 @@ import { useState } from "react";
 import { Eye, EyeOff} from "lucide-react";
 import { useForm } from "react-hook-form";
 import { singnupSchema, type SingnupSchema } from "~/schemas/auth";
+import { registerUser } from "~/actions/auth";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 
 
 
 export default function SignupPage(){
+    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [show, setShow] = useState(false)
@@ -26,7 +30,34 @@ export default function SignupPage(){
     });
 
     async function onSubmit(data: SingnupSchema) {
-        ""
+        try {
+            setLoading(true);
+            
+            const results = await registerUser(data);
+
+            if (results.error) {
+                setError(results.error);
+                return;
+            }
+
+            //Login after registration
+            const signInResult = await signIn("credentials", {
+                redirect: false,
+                email: data.email,
+                password: data.password,
+            });
+
+            if(!signInResult?.error){
+                await router.push("/");
+            } else {
+                setError("Failed to sing in")
+            }
+
+        } catch(error){
+            setError("Unable to signup");
+        } finally {
+            setLoading(false);
+        }
     }
     
     return( <div className="min-h-screen bg-white">
