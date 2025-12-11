@@ -8,8 +8,7 @@ import { useForm } from "react-hook-form";
 import { singnupSchema, type SingnupSchema } from "~/schemas/auth";
 import { registerUser } from "~/actions/auth";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/router";
-
+import { useRouter } from "next/navigation";
 
 
 export default function SignupPage(){
@@ -48,19 +47,19 @@ export default function SignupPage(){
             });
 
             if(!signInResult?.error){
-                await router.push("/");
+                router.push("/");
             } else {
                 setError("Failed to sing in")
             }
 
         } catch(error){
-            setError("Unable to signup");
+            setError("Unable to signup: ");
         } finally {
             setLoading(false);
         }
     }
     
-    return( <div className="min-h-screen bg-white">
+    return( <div className="min-h-screen bg-linear-to-l from-[#bbcdeb] to-[#f0f4fb] bg-white">
         <nav className="flex h-16 items-center justify-between border-b border-gray-200 px-10">
             <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-800 text-white">
