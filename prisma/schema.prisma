@@ -65,6 +65,8 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    apiQuota      ApiQuota?
+    videoFiles    VideoFile[]
 }
 
 model VerificationToken {
@@ -73,4 +75,25 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// ApiQuota model with fields for user quota management
+model ApiQuota {
+    id  String  @id @default(cuid())
+    userId String @unique
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    requestUsed Int @default(0)
+    maxRequests Int @default(1000)
+    lastResetDate DateTime @default(now())
+    secretKey String @unique
+}
+
+// VideoFile model to track user-uploaded video files
+model VideoFile {
+    id      String @id @default(cuid())
+    userId  String @unique
+    user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    key     String @unique
+    analyzed    Boolean @default(false)
+    createdAt   DateTime @default(now())
 }

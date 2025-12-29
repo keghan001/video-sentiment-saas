@@ -164,6 +164,23 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.ApiQuotaScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  requestUsed: 'requestUsed',
+  maxRequests: 'maxRequests',
+  lastResetDate: 'lastResetDate',
+  secretKey: 'secretKey'
+};
+
+exports.Prisma.VideoFileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  key: 'key',
+  analyzed: 'analyzed',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -180,7 +197,9 @@ exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  ApiQuota: 'ApiQuota',
+  VideoFile: 'VideoFile'
 };
 
 /**
