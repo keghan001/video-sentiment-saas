@@ -1,6 +1,7 @@
 "use server"
 
 import Link from "next/link";
+import CodeExamples from "~/components/client/code-examples";
 import CopyButton from "~/components/client/copy-button";
 import { SignOutButton } from "~/components/client/signout";
 import { auth } from "~/server/auth";
@@ -64,6 +65,7 @@ export default async function HomePage() {
                 }} className="h-1 rounded-full bg-[#54534ff1]"></div>
               </div>
             </div>
+            <CodeExamples></CodeExamples>
           </div>
         </main>
 
