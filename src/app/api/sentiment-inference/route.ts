@@ -1,4 +1,6 @@
+import { InvokeEndpointCommand, SageMakerRuntimeClient } from "@aws-sdk/client-sagemaker-runtime";
 import { NextResponse } from "next/server";
+import { env } from "~/env";
 import { checkAndUpdateQuota } from "~/lib/quota";
 import { db } from "~/server/db";
 
@@ -62,12 +64,38 @@ export async function POST(req: Request) {
             )
         }
 
-        
+        //Call Sagemaker endpoint
+        const sagemakerClient = new SageMakerRuntimeClient({
+            region: env.AWS_REGION,
+            credentials: {
+                accessKeyId: env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+            }
+        });
+
+        const command = new InvokeEndpointCommand({
+            EndpointName: env.AWS_ENPOINT_NAME,
+            ContentType: "application/json",
+            Body: JSON.stringify({
+                video_path: `s3://sentiment-analyzer-saas/${key}`
+            })
+        });
+
+        const response = await sagemakerClient.send(command);
+        const analysis = JSON.parse(new TextDecoder().decode(response.Body));
+
+        await db.videoFile.update({
+            where: { key },
+            data: {
+                analyzed: true,
+            },
+        });
+
         return NextResponse.json({
-            quota
+            analysis,
         });
     } catch (error) {
-        console.error("Upload error: ", error);
+        console.error("Analysis error: ", error);
         return NextResponse.json(
             { error: "Internal server error" }, 
             { status: 500 });
