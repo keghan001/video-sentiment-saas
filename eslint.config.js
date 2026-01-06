@@ -30,6 +30,7 @@ export default tseslint.config(
       ],
       "@typescript-eslint/prefer-optional-chain": "off",
       "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/no-unsafe-assignment": "error",
       "@typescript-eslint/no-misused-promises": [
         "error",
         { checksVoidReturn: { attributes: false } },
