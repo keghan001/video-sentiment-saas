@@ -2,19 +2,80 @@
 
 import { useState } from "react";
 import { FiUpload } from "react-icons/fi";
+import type { Analysis } from "./inference";
 
 interface UploadVideoProps {
     apiKey: string;
+    onAnalysis: (analysis: Analysis) => void;
 }
 
-function UploadVideo({ apiKey }: UploadVideoProps) {
+function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
     const [status, setStatus] = useState<"idle" | "uploading" | "analyzing">(
         "idle");
     
     const [error, setError] = useState<string | null>(null);
 
     const handleUpload = async (file: File) => {
+    try {
+        setStatus("uploading");
+        setError(null);
+
+        const fileType = `.${file.name.split(".").pop()}`;
+
+        //1. Get upload URL
+        const res = await fetch('/api/upload-url', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer' + apiKey,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({fileType: fileType})
+        }).then(res => res.json());
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error?.error || "Failed to get upload URL")
+        }
+
+        const { url, fileId, key } = res.json();
     
+        //2. Upload file to S3
+        const uploadRes = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'video/mp4'},
+            body: file.type
+            })
+
+        if (!uploadRes.ok) {
+            throw new Error("Failed to upload file");
+        }
+
+        setStatus("analyzing");
+    
+        // 3. Analyze video
+        const analysisRes = await fetch('/api/sentiment-inference', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer' + apiKey,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key })
+        }).then(res => res.json());
+
+        if (!analysisRes.ok) {
+            throw new Error("Failed to analyse");
+        }
+
+        const analysis = await analysisRes.json();
+        console.log("Analysis", analysis);
+        onAnalysis(analysis);
+        setStatus("idle");
+
+    } catch (error) {
+        setError(error instanceof Error ? error.message : "Upload failed!");
+        console.error("Upload failed", error);
+        throw error;
+    }
     };
 
     return (
